@@ -6,7 +6,9 @@ export default function App() {
     
     const [startGame, setStartGame] = React.useState(false)
     const [question, setQuestion] = React.useState([])
-    const [answer, setAnswer] = React.useState([])
+    const [allAnswers, setAllAnswers] = React.useState([])
+    const [rightAnswers, setRightAnswers] = React.useState([])
+    const [falseAnswers, setFalseAnswers] = React.useState([])
     
     function startGameFunc() {
         console.log("started")
@@ -15,23 +17,34 @@ export default function App() {
     }
     
     React.useEffect(() => {
-        fetch("https://opentdb.com/api.php?amount=10")
+        fetch("https://opentdb.com/api.php?amount=5")
             .then(res => res.json())
             .then(data => {
                 //console.log(data.results)
                 if(data && data.results && Array.isArray(data.results)) {
                     const questionsArr = data.results.map(result => result.question)
                     const correctAnswerArr = data.results.map(result => result.correct_answer)
+                    const incorrectAnswerArr = data.results.map(result => result.incorrect_answers)
                     setQuestion(questionsArr)
-                    setAnswer(correctAnswerArr)
+                    
+                    const rightAnswers = []
+                    const falseAnswers = []
+                    
+                    for (
+                        let i = 0; i < correctAnswerArr.length && i < incorrectAnswerArr.length; i++
+                        ) 
+                        {
+                            rightAnswers.push(correctAnswerArr[i]);
+                            falseAnswers.push(...incorrectAnswerArr[i])
+                    }
+                    setRightAnswers(rightAnswers)
+                    setFalseAnswers(falseAnswers)
                 }
             })
             .catch(error => {
                 console.error("Error fetching data:", error)
             })
-    }, [question, answer])
-    
-    //console.log(answer)
+    }, [])
     
     return (
         <main>
@@ -44,7 +57,9 @@ export default function App() {
                 :
                <Quiz
                     questions={question}
-                    answers={answer}
+                    allAnswers={allAnswers}
+                    rightAnswer={rightAnswers}
+                    falseAnswer={falseAnswers}
                />
             }
            
