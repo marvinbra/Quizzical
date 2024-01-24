@@ -25,6 +25,7 @@ export default function App() {
                     const questionsArr = data.results.map(result => result.question)
                     const correctAnswerArr = data.results.map(result => result.correct_answer)
                     const incorrectAnswerArr = data.results.map(result => result.incorrect_answers)
+                    
                     setQuestion(questionsArr)
                     
                     const rightAnswers = []
@@ -34,17 +35,33 @@ export default function App() {
                         let i = 0; i < correctAnswerArr.length && i < incorrectAnswerArr.length; i++
                         ) 
                         {
-                            rightAnswers.push(correctAnswerArr[i]);
-                            falseAnswers.push(...incorrectAnswerArr[i])
+                           rightAnswers.push(
+                               { isCorrect: true, content: correctAnswerArr[i] }
+                               )
+                            falseAnswers.push(
+                                { isCorrect: false, content: incorrectAnswerArr[i] }
+                                )
                     }
+                    
                     setRightAnswers(rightAnswers)
                     setFalseAnswers(falseAnswers)
+                    
+                     const allAnswers = rightAnswers.concat(falseAnswers)
+                     
+                     for (let i = allAnswers.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [allAnswers[i], allAnswers[j]] = [allAnswers[j], allAnswers[i]];
+                    }
+                    
+                    setAllAnswers(allAnswers)
+                    
                 }
             })
             .catch(error => {
                 console.error("Error fetching data:", error)
             })
     }, [])
+    
     
     return (
         <main>
