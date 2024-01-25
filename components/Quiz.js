@@ -3,14 +3,14 @@ import {encode} from 'html-entities'
 
 export default function Quiz(props) {
     
-    console.log(props.falseAnswers[0])
-    console.log(props.answers[0])
+    //console.log(props.rightAnswer)
+    //console.log(props.falseAnswer)
+    //console.log(props.allAnswers)
     
-        //for (let i = 0; i < props.questions.length; i++) {
-        //console.log(props.questions[i])
-        //perguntas += props.questions[i]
-        //console.log(perguntas)
-    //}
+    for (let i = 0; i < props.questions.length; i++) {
+        console.log(props.rightAnswer[i])
+        console.log(props.falseAnswer[i])
+    }
     
     const quizQuestion = props.questions.map((question, index) => {
         //console.log(question)
