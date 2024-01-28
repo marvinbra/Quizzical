@@ -5,13 +5,36 @@ export default function Quiz(props) {
     
     //console.log(props.rightAnswer)
     //console.log(props.falseAnswer)
-    //console.log(props.allAnswers)
+    console.log(props.allAnswers)
     
-    for (let i = 0; i < props.questions.length; i++) {
-        console.log(props.rightAnswer[i])
-        console.log(props.falseAnswer[i])
+    //const allAnswers = props.allAnswers.map(answer => {
+    //    console.log(answer)
+    //})
+    
+    let mergedData = props.allAnswers.reduce((acc, current) => {
+    let existingItem = acc.find(item => JSON.stringify(item.index) === JSON.stringify(current.index));
+
+    if (existingItem) {
+        // Merge properties of the existing item with the current item
+        Object.entries(current).forEach(([key, value]) => {
+        if (key !== 'index') {
+            existingItem[key] = Array.isArray(existingItem[key])
+            ? existingItem[key].concat(value)
+            : [existingItem[key], value];
+        }
+        });
+    } else {
+        // Add the current item to the accumulator
+        acc.push(current);
     }
+
+    return acc;
+    }, []);
+
+    console.log(mergedData)
     
+    
+
     const quizQuestion = props.questions.map((question, index) => {
         //console.log(question)
         return  (
