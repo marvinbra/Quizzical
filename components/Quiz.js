@@ -1,54 +1,127 @@
 import React from "react"
-import {encode} from 'html-entities'
+import SingleQuestion from "./SingleQuestion"
 
-export default function Quiz(props) {
+export default function Questions() {
     
-    //console.log(props.rightAnswer)
-    //console.log(props.falseAnswer)
-    console.log(props.allAnswers)
+    const [questions, setQuestions] = React.useState([])
+    const [questionsAndAnswers, setQuestionsAndAnswers] = React.useState([])
+    const [showWarning, setShowWarning] = React.useState(false)
+    const [numCorrectAnswers, setNumCorrectAnswers] = React.useState(0)
+    const [showResults, setShowResults] = React.useState(false)
     
-    //const allAnswers = props.allAnswers.map(answer => {
-    //    console.log(answer)
-    //})
-    
-    let mergedData = props.allAnswers.reduce((acc, current) => {
-    let existingItem = acc.find(item => JSON.stringify(item.index) === JSON.stringify(current.index));
-
-    if (existingItem) {
-        // Merge properties of the existing item with the current item
-        Object.entries(current).forEach(([key, value]) => {
-        if (key !== 'index') {
-            existingItem[key] = Array.isArray(existingItem[key])
-            ? existingItem[key].concat(value)
-            : [existingItem[key], value];
+    React.useEffect(() => {
+        if(questionsAndAnswers.length === 0) {
+            fetch("https://opentdb.com/api.php?amount=5")
+                .then(res => res.json())
+                .then(data => {
+                    //console.log(data.results)
+                    setQuestions(data.results)
+                    setQuestionsAndAnswers(
+                        data.results.map( (questionObj) => {
+                        return {
+                                question: questionObj.question,
+                                shuffledAnswers: shuffle([
+                                        ...questionObj.incorrect_answers,
+                                        questionObj.correct_answer
+                                    ]),
+                                correctAnswer: questionObj.correct_answer,
+                                selectedAnswer: ""
+                            }
+                        })
+                    )
+                })            
         }
-        });
-    } else {
-        // Add the current item to the accumulator
-        acc.push(current);
+    }, [questionsAndAnswers])
+    
+    // stackoverflow
+    function shuffle(array) {
+    let currentIndex = array.length,  randomIndex;
+
+    // While there remain elements to shuffle.
+        while (currentIndex > 0) {
+
+        // Pick a remaining element.
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        // And swap it with the current element.
+        [array[currentIndex], array[randomIndex]] = [
+        array[randomIndex], array[currentIndex]];
     }
 
-    return acc;
-    }, []);
-
-    console.log(mergedData)
+    return array;
+  }
     
+    //console.log(questionsAndAnswers)
     
-
-    const quizQuestion = props.questions.map((question, index) => {
-        //console.log(question)
-        return  (
-            <div>
-                <p>{question}</p>
-                <hr />
-            </div>
+    function updateAnswer(currentQuestion, answer) {
+        setQuestionsAndAnswers(
+            questionsAndAnswers.map(questionObj => {
+                return questionObj.question === currentQuestion
+                ? {...questionObj, selectedAnswer: answer}
+                : questionObj
+            })
+        )
+    }
+    
+    function checkAnswers() {
+        const notAllAnswered = questionsAndAnswers.some( questionObj => {
+            return questionObj.selectedAnswer === ""
+        })
+        setShowWarning(notAllAnswered)
+        
+        // all questions have been answered
+        if (!notAllAnswered) {
+            questionsAndAnswers.forEach( questionObj => {
+                if(questionObj.selectedAnswer === questionObj.correctAnswer) {
+                    setNumCorrectAnswers(prevNum => prevNum + 1)
+                }
+            })
+            setShowResults(true)
+        }
+    }
+    
+    function playAgain() {
+        setQuestions([])
+        setQuestionsAndAnswers([])
+        setShowResults(false)
+        setNumCorrectAnswers(0)
+    }
+    
+    const questionsElement = questionsAndAnswers.map( (questionObj, index) => {
+        return (
+            <SingleQuestion
+                key={index}
+                question={questionObj.question}
+                allAnswers={questionObj.shuffledAnswers}
+                updateAnswer={updateAnswer}
+                selectedAnswer={questionObj.selectedAnswer}
+                showResult={showResults}
+                correctAnswer={questionObj.correctAnswer}
+            />
         )
     })
     
     return (
-        <section>
-            <h1>Quiz started, good luck!</h1>
-            <p>{quizQuestion}</p>
-        </section>
+        <div>
+        
+            <div>{questionsElement}</div>
+            
+            {!showWarning ? "" : <p>Not all questions have been answered yet</p>}
+            
+            { questions.length > 0 && !showResults ?
+                <button onClick={checkAnswers}>Check answers</button>
+              : ""
+            }
+            
+            { showResults ?
+                <div>
+                    <p>You scored {numCorrectAnswers}/5 correct answers</p>
+                    <button onClick={playAgain}>Play again</button>
+                </div> 
+                : ""
+            }
+            
+        </div>
     )
 }
