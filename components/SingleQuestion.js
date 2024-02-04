@@ -11,9 +11,14 @@ export default function SingleQuestion(props) {
     const answerElements = props.allAnswers.map((answer, index) => {
         return (
             <button 
-            key={index} 
-            onClick={() => clickAnswer(answer, props.question)}
-            className={`answer-btn ${answer === props.selectedAnswer ? "selected" : ""}`}
+                key={index} 
+                onClick={() => clickAnswer(answer, props.question)}
+                className={`answer-btn ${
+                    answer === props.selectedAnswer ? "selected" : ""
+                    }
+                    ${props.showResult && answer === props.correctAnswer ? "correct" : ""}
+                    ${props.showResult && answer === props.selectedAnswer && answer !== props.correctAnswer ? "incorrect" : ""}
+                `}
             >
                 {decode(answer)}
             </button>
@@ -21,9 +26,11 @@ export default function SingleQuestion(props) {
     })
     
     return (
-        <div>
-            <h3>{decode(props.question)}</h3>
-            <div>{answerElements}</div>
+        <div className="question-container">
+            <h2 className="question">{decode(props.question)}</h2>
+                <div className="answers-btn-container">
+                    {answerElements}
+                </div>
             <hr />
         </div>
     )

@@ -105,19 +105,35 @@ export default function Questions() {
     return (
         <div>
         
-            <div>{questionsElement}</div>
+            <div className="questions-container">
+                {questionsElement}
+            </div>
             
-            {!showWarning ? "" : <p>Not all questions have been answered yet</p>}
+            <div className="text-center">
             
-            { questions.length > 0 && !showResults ?
-                <button onClick={checkAnswers}>Check answers</button>
-              : ""
-            }
+                {!showWarning ? "" 
+                 : <p className="warning-message">
+                    Not all questions have been answered yet
+                  </p>}
+            
+                { questions.length > 0 && !showResults ?
+                    <button onClick={checkAnswers} className="check-btn">Check answers</button>
+                : ""
+                }
+                
+            </div>
             
             { showResults ?
-                <div>
-                    <p>You scored {numCorrectAnswers}/5 correct answers</p>
-                    <button onClick={playAgain}>Play again</button>
+                <div className="result-container">
+                
+                    <p className="result-message">
+                        You scored {numCorrectAnswers}/5 correct answers
+                    </p>
+                    
+                    <button onClick={playAgain} className="play-again-btn">
+                        Play again
+                    </button>
+                    
                 </div> 
                 : ""
             }
