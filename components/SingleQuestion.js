@@ -19,6 +19,7 @@ export default function SingleQuestion(props) {
                     ${props.showResult && answer === props.correctAnswer ? "correct" : ""}
                     ${props.showResult && answer === props.selectedAnswer && answer !== props.correctAnswer ? "incorrect" : ""}
                 `}
+                disabled={props.showResult}
             >
                 {decode(answer)}
             </button>
