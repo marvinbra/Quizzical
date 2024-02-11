@@ -52,8 +52,6 @@ export default function Questions() {
     return array;
   }
     
-    //console.log(questionsAndAnswers)
-    
     function updateAnswer(currentQuestion, answer) {
         setQuestionsAndAnswers(
             questionsAndAnswers.map(questionObj => {
